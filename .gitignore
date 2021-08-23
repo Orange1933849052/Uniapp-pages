@@ -1,0 +1,11 @@
+.DS_Storep
+.DS_Store
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+/unpackage/dist/dev
+
