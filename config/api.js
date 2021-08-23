@@ -1,7 +1,6 @@
-	const DOMAIN_PREFIX = 'https://ceres.zkthink.com'
+	const DOMAIN_PREFIX = 'http://localhost1:9007'
 // #ifndef H5
 	const WX_API_BASE = DOMAIN_PREFIX + '/api' // app
-	// const WX_API_BASE = 'http://3j073r3905.qicp.vip:29544'
 // #endif
 
 // #ifdef H5

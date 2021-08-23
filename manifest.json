@@ -1,9 +1,9 @@
 {
-    "name" : "cereshop",
-    "appid" : "__UNI__BA992F9",
-    "description" : "cereshop",
-    "versionName" : "1.4.0",
-    "versionCode" : 140,
+    "name" : "veronica-mall",
+    "appid" : "__UNI__CB189AB",
+    "description" : "veronica-mall",
+    "versionName" : "1.0.0",
+    "versionCode" : 100,
     "transformPx" : false,
     "app-plus" : {
         "usingComponents" : true,
@@ -126,15 +126,15 @@
             "mode" : "hash",
             "base" : "/h5/"
         },
-        "title" : "cereshop",
-        "domain" : "ceres.zkthink.com",
+        "title" : "veronicaMall",
+        "domain" : "localhost",
         "devServer" : {
             "port" : 8080, //端口号
             "disableHostCheck" : true,
             "proxy" : {
                 "/api" : {
-                    // "target" : "http://3j073r3905.qicp.vip:29544", //目标接口域名
-                    "target" : "https://ceres.zkthink.com/api", //目标接口域名
+                    "target" : "http://localhost:9007/api", //目标接口域名
+                    // "target" : "https://ceres.zkthink.com/api", //目标接口域名
                     "changeOrigin" : true, //是否跨域
                     "secure" : true, // 设置支持https协议的代理
                     "pathRewrite" : {
