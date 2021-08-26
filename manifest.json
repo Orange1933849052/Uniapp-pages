@@ -124,17 +124,17 @@
     "h5" : {
         "router" : {
             "mode" : "hash",
-            "base" : "/h5/"
+            "base" : "/"
         },
-        "title" : "veronicaMall",
-        "domain" : "localhost",
+        "title" : "奥莱仓",
+        "domain" : "mall.lantiansh.cn",
         "devServer" : {
             "port" : 8080, //端口号
             "disableHostCheck" : true,
             "proxy" : {
                 "/api" : {
-                    "target" : "http://localhost:9007/api", //目标接口域名
-                    // "target" : "https://ceres.zkthink.com/api", //目标接口域名
+                    // "target" : "http://localhost:9007/api", //目标接口域名-测试
+                    "target" : "https://mall.lantiansh.cn/api", //目标接口域名-正式
                     "changeOrigin" : true, //是否跨域
                     "secure" : true, // 设置支持https协议的代理
                     "pathRewrite" : {
