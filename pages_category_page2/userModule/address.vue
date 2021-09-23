@@ -3,20 +3,40 @@
 	<view class="container">
 		<view v-if="addresList.total>0" class="pad-bot-140">
 			<view class="addAddress-content flex-row-plus" v-for="(item, index) in addresListlist" :key="index">
-				<view class="address-hesd">{{item.username1}}</view>
+				<!-- <view class="address-hesd">{{item.username1}}</view> -->
 				<view class="address-detail" @click="itemTap(item)">
 					<view>
 						<label>{{item.receiveName}}</label>
-						<label class="fs24 font-color-999 mar-left-10">{{item.receivePhone}}</label>
+						<label class="fs24 font-color-999 mar-left-10">{{item.receivePhone | phone}}</label>
 					</view>
 					<view class="defaultAD-box">
-						<text class="def" v-if="item.defult">默认</text>
-						<text class="lable" v-else-if="item.label!=''">{{item.label}}</text>
+						<!-- <text class="def" v-if="item.defult">默认</text> -->
+						<!-- <text class="lable" v-else-if="item.label!=''">{{item.label}}</text> -->
 						<text class="user-address">{{item.receiveAdress}}{{item.address}}</text>
 					</view>
 				</view>
-				<view class="right-Line"></view>
-				<view class="font-color-999 fs24" @click="editAdress(index, item)">编辑</view>
+				<div class="address-modify">
+					<div>
+						<u-checkbox
+							v-model="item.defult"
+							@change="checkBoxChange(index)"
+							shape="circle"
+							active-color="#FB3F3D"
+						>默认地址</u-checkbox>
+					</div>
+					<div class="modify-btn">
+						<div>
+							<image :src="require('@/static/assets/address/bianji_@2x.png')" mode="widthFix" />
+							<span>编辑</span>
+						</div>
+						<div>
+							<image :src="require('@/static/assets/address/shanchu_@2x.png')" mode="widthFix" />
+							<span>删除</span>
+						</div>
+					</div>
+				</div>
+				<!-- <view class="right-Line"></view> -->
+				<!-- <view class="font-color-999 fs24" @click="editAdress(index, item)">编辑</view> -->
 			</view>
 		</view>
 		<view v-else class="emptyAddress-box">
@@ -24,7 +44,7 @@
 			<label>你还没有添加地址哦～</label>
 		</view>
 		<view class="addAddress-box">
-			<view class="addAddress" @click="addAddressClick">添加新地址</view>
+			<view class="addAddress" @click="addAddressClick">新建地址</view>
 		</view>
 	</view>
 </template>
@@ -43,6 +63,13 @@
 				page:1,//当前页
 				pageSize:20,//每页记录数
 				loadingType:0,
+				name: true,
+			}
+		},
+		filters: {
+			phone: function (val) {
+				let reg=/^(.{3}).*(.{4})$/;
+ 				return val.replace(reg,'$1****$2');
 			}
 		},
 		onLoad(options) {
@@ -69,6 +96,13 @@
 			}
 		},
 		methods: {
+			checkBoxChange(index){
+				for (let i = 0; i < this.addresListlist.length; i++) {
+					this.addresListlist[i].defult = false;
+				}
+				this.addresListlist[index].defult = true;
+				// this.$forceUpdate()
+			},
 			back(){
 				if(this.type == 1){
 					uni.navigateTo({
@@ -126,7 +160,11 @@
 </script>
 
 <style lang="scss">
+	page{
+		background: #F5F5F5;	
+	}
 	.container{
+		padding: 0 32rpx;
 		.emptyAddress-box{
 			display: flex;
 			justify-content: center;
@@ -149,14 +187,39 @@
 				border-radius: 40upx;
 				text-align: center;
 				line-height: 80upx;
-				background-image: linear-gradient( 135deg, #FFA100 10%, #FF7911 100%);
+				background: #FB3F3D;
 			}
 		}
 		.addAddress-content{
 			display: flex;
-			align-items: center;
-			justify-content: space-around;
+			// align-items: center;
+			flex-direction: column;
+			// justify-content: space-around;
 			padding: 30upx 30upx;
+			background: #fff;
+			margin-top: 26rpx;
+			border-radius: 8rpx;
+			.address-modify{
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding-top: 30rpx;
+				image{
+					width: 30rpx;
+				}
+				.modify-btn{
+					display: flex;
+					align-items: center;
+					div{
+						display: flex;
+						align-items: center;
+						margin-left: 15rpx;
+						span{
+							padding-left: 10rpx;
+						}
+					}
+				}
+			}
 			.lable {
 			  padding: 3rpx 10rpx;
 			  background: rgba(153, 153, 153, 0.2);
@@ -176,10 +239,9 @@
 				color: #FF7911;
 			}
 			.user-address {
-			  font-size: 28rpx;
+			  font-size: 24rpx;
 			  font-weight: 500;
-			  color: rgba(51, 51, 51, 1);
-			  margin-left: 10rpx;
+			  color: #ABABAB;
 
 			}
 			.address-hesd{
@@ -193,8 +255,9 @@
 			}
 			.defaultAD-box{
 				width: 455upx;
+				margin-top: 10rpx;
 				.default-textBox{
-					padding-right: 20upx;
+					padding: 20upx;
 					width: 80upx;
 				}
 				.default-content{

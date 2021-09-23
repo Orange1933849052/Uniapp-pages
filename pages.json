@@ -11,15 +11,21 @@
 			}
 		},
 		{
+			"path": "pages/tabbar/school/index",
+			"style": {
+				"navigationBarTitleText": "学堂"
+			}
+		},
+		{
 			"path": "pages/tabbar/category/index",
 			"style": {
-				"navigationBarTitleText": "分类"
+				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/tabbar/cart/index",
 			"style": {
-				"navigationBarTitleText": "购物车"
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -429,26 +435,32 @@
 		"selectedColor": "#FF7800",
 		"list": [{
 				"pagePath": "pages/tabbar/index/index",
-				"iconPath": "static/img/tabbar/home.png",
-				"selectedIconPath": "static/img/tabbar/homeactive.png",
+				"iconPath": "static/img/tabbar/shouye_@2x.png",
+				"selectedIconPath": "static/img/tabbar/shouye_red_@2x.png",
 				"text": "首页"
 			},
 			{
 				"pagePath": "pages/tabbar/category/index",
-				"iconPath": "static/img/tabbar/fenlei.png",
-				"selectedIconPath": "static/img/tabbar/fenleiactive.png",
-				"text": "分类"
+				"iconPath": "static/img/tabbar/shouye_dianpu_@2x.png",
+				"selectedIconPath": "static/img/tabbar/shouye_dianpu_red_@2x.png",
+				"text": "店铺"
+			},
+			{
+				"pagePath": "pages/tabbar/school/index",
+				"iconPath": "static/img/tabbar/shouye_xuetang_@2x.png",
+				"selectedIconPath": "static/img/tabbar/shouye_xuetang_red_@2x.png",
+				"text": "学堂"
 			},
 			{
 				"pagePath": "pages/tabbar/cart/index",
-				"iconPath": "static/img/tabbar/gouwuche.png",
-				"selectedIconPath": "static/img/tabbar/gouwucheactive.png",
+				"iconPath": "static/img/tabbar/shouye_gouwuche_@2x.png",
+				"selectedIconPath": "static/img/tabbar/shouye_gouwuche_red_@2x.png",
 				"text": "购物车"
 			},
 			{
 				"pagePath": "pages/tabbar/user/index",
-				"iconPath": "static/img/tabbar/wode.png",
-				"selectedIconPath": "static/img/tabbar/wodeactive.png",
+				"iconPath": "static/img/tabbar/shouye_wode_@2x.png",
+				"selectedIconPath": "static/img/tabbar/wode2xred_@2x.png",
 				"text": "我的"
 			}
 		]

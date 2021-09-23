@@ -4,7 +4,8 @@
 		<view v-if="dataList.length>0">
 			<view class="cart-bg">
 				<view class="cart-num-box">
-					<text class="num-box">共<text class="num">{{allNum}}</text>件宝贝</text>
+					<image class="dizhi-box" :src="require('@/static/assets/car/gwc_dizhi_@2x.png')"></image>
+					<text class="title_box">购物车</text>
 					<text class="btn-box" @click="btnTypeClick(1)" v-if="btnType == 0">管理</text>
 					<text class="btn-box" @click="btnTypeClick(0)" v-if="btnType == 1">完成</text>
 				</view>
@@ -13,7 +14,7 @@
 				<view v-for="(item, index) in dataList" :key="item.shopId">
 					<view class="item">
 						<view class="shop-box">
-							<image v-if="item.selected == 1" src="../../../static/images/select-active.png" class="cart-select-img"  @click="updateShopSel(index,0)"></image>
+							<image v-if="item.selected == 1" src="../../../static/assets/car/gwc_gouxuan_@2x.png" class="cart-select-img"  @click="updateShopSel(index,0)"></image>
 							<image v-else src="../../../static/images/select-empty.png" class="cart-select-img" @click="updateShopSel(index,1)"></image>
 							<view class="shop-name-box" @click="goStore(index)">
 								<image src="../../../static/images/orderStore-icon.png" class="shop-img"></image>
@@ -21,34 +22,44 @@
 								<image src="../../../static/img/user/arrow.png" class="arrow-right-img"></image>
 							</view>
 						</view>
-						<view v-for="(skuItem, cIndex) in dataList[index].skus" class="product-list-box">
+						<view v-for="(skuItem, cIndex) in dataList[index].skus" :key="cIndex" class="product-list-box">
 							<view class="pro-item" @click="goodsDateils(item.shopId,skuItem.productId,skuItem.skuId)">
-								<image v-if="skuItem.selected == 1" src="../../../static/images/select-active.png" @click.stop="cartItemSel(index,cIndex,0)"  class="cart-select-img"></image>
+								<image v-if="skuItem.selected == 1" src="../../../static/assets/car/gwc_gouxuan_@2x.png" @click.stop="cartItemSel(index,cIndex,0)"  class="cart-select-img"></image>
 								<image v-else src="../../../static/images/select-empty.png" @click.stop="cartItemSel(index,cIndex,1)" class="cart-select-img"></image>
 								<view class="pro-r">
 									<image :src="skuItem.image" class="pro-img"></image>
 									<view class="pro-r-r">
 										<view class="pro-name">{{skuItem.productName}}</view>
-										<view class="sku-box">
-											<text v-if="skuItem.value">{{skuItem.value}}</text>
+										<view class="sku-box" @click.stop="popupShow(skuItem)">
+											<text v-if="skuItem.value">{{skuItem.value}} <span style="padding-left:8rpx">x{{skuItem.number}}</span></text>
 											<text v-else>默认规格</text>
+											<!-- <text>{{skuItem.number}}</text> -->
 											<image v-if="false" src="../../../static/images/arrow-down.png" class="arrow-down-img"></image>
 										</view>
+										<div class="sku-img">
+											<image :src="require('@/static/assets/car/gwc_tuihuan_@2x.png')"></image>
+										</div>
 										<view class="pro-price-num-box">
 											<view class="pro-price-box">
-												<text class="fuhao">￥</text>
+												<text>结算价￥</text>
 												<text>{{skuItem.price}}</text>
 											</view>
-											<view class="pro-num-box">
+											<!-- <view class="pro-num-box">
 												<text class="num-btn r" @click.stop="numSub(index,cIndex)">-</text>
 												<text class="num">{{skuItem.number}}</text>
 												<text class="num-btn l" @click.stop="numAdd(index,cIndex)">+</text>
-											</view>
+											</view> -->
 										</view>
 									</view>
 								</view>
 							</view>
 						</view>
+						<div class="remarks" @click.stop="addRemarks(item)">
+							<div>
+								<span style="padding-right:6rpx">添加备注</span>
+								<u-icon name="arrow-right" color="#888888"></u-icon>
+							</div>
+						</div>
 					</view>
 				</view>
 			</view>
@@ -60,7 +71,7 @@
 			<!-- #endif -->
 				<view class="cart-bottom">
 					<view class="left">
-						<image v-if="isAllCheck" src="../../../static/images/select-active.png" class="cart-select-img" @click="allSel(0)"></image>
+						<image v-if="isAllCheck" src="../../../static/assets/car/gwc_gouxuan_@2x.png" class="cart-select-img" @click="allSel(0)"></image>
 						<image v-else src="../../../static/images/select-empty.png" class="cart-select-img" @click="allSel(1)"></image>
 						<text>全选</text>
 					</view>
@@ -69,21 +80,72 @@
 							<text>合计：</text>
 							<text class="price">¥{{checkMoney}}</text>
 						</view>
-						<view class="btn-confirm" @click="settlementTap">结算（{{checkNum}}）</view>
+						<view class="btn-confirm" @click="settlementTap" :style="noChoose ? 'background: #E5E5E5;color: #333333;':''">结算</view>
 					</view>
 					<view class="right" v-if="btnType == 1">
-						<view class="btn-delete" @click="cartDel">删除</view>
+						<view class="btn-confirm" @click="cartDel" :style="noChoose ? 'background: #E5E5E5;color: #333333;':''">删除</view>
 					</view>
 				</view>
 			</view>
 		</view>
 		<!-- 购物车为空 -->
-		<view v-else class="emptyCart-box flex-items-plus flex-column">
+		<view v-if="dataList.length===0" class="emptyCart-box flex-items-plus flex-column">
 			<image class="emptyCart-img" src="../../../static/images/cartEmpty.png"></image>
 			<label class="font-color-999 fs26 mar-top-30">你的购物车还没有宝贝哦</label>
 			<label class="font-color-999 fs26 mar-top-10">快去首页选一个吧～</label>
 		</view>
-
+		<u-popup class="car-popup" v-model="show" v-if="popupData" mode="bottom">
+			<div class="car-popup-container">
+				<div class="head">
+					<div class="head-left">
+						<image :src="popupData.image" mode="widthFix" />
+					</div>
+					<div class="head-middle">
+						<div class="h-m-top">
+							<span>¥</span>
+							<span>{{popupData.price}}</span>
+						</div>
+						<div class="h-m-bottom">
+							{{popupData.price}}+人已购买
+						</div>
+					</div>
+					<div class="head-right">
+						<u-icon name="close-circle" color="#B6B6B6" size="45"></u-icon>
+					</div>
+				</div>
+				<div class="content">
+					<div class="c-title">颜色分类(3)</div>
+					<scroll-view scroll-y="true" class="content-scroll">
+						<div v-for="(item, index) in 10" :class="csCurrent===index?'active':''" @click="cItemClick(item,index)" :key="index" class="c-s-item">
+							005橡芽白/深苔藓绿
+						</div>
+					</scroll-view>
+				</div>
+				<div class="foot">
+					<div class="f-title">鞋码</div>
+					<scroll-view scroll-x="true" class="foot-scroll">
+						<div @click="footClick(item,index)" :class="index===footCurrent?'active':''" v-for="(item,index) in 10" :key="index" class="f-item">
+							43
+						</div>
+					</scroll-view>
+				</div>
+				<div class="btn">
+					<div>确认</div>
+				</div>
+			</div>
+		</u-popup>
+		<u-popup class="remark-popup" mode="center" v-model="remarkShow" border-radius="16">
+			<div class="remark-container">
+				<div class="title">添加备注</div>
+				<div class="textarea">
+					<textarea placeholder="请输入备注信息" />
+				</div>
+				<div class="btn">
+					<div @click="remarkShow = false">取消</div>
+					<div>确认</div>
+				</div>
+			</div>
+		</u-popup>
 	</view>
 </template>
 
@@ -108,11 +170,27 @@
 				checkMoney: 0,
 				isAllCheck: true,
 				skuProdList:{},
-				item:{}
+				item:{},
+				noChoose: false,
+				show: false,
+				popupData: null,
+				csCurrent: '',
+				footCurrent: '',
+				remarkShow: false,
+				remark: ''
 			}
 		},
 		onLoad() {
 
+		},
+		watch: {
+			checkMoney(n,o){
+				if (n === 0) {
+					this.noChoose = true;
+				} else {
+					this.noChoose = false;
+				}
+			}
 		},
 		onShow() {
 			//判断是否登录
@@ -129,6 +207,23 @@
 			}
 		},
 		methods: {
+			addRemarks(e){
+				this.remarkShow = true;
+			},
+			footClick(e,index){
+				this.footCurrent = index;
+			},
+			cItemClick(e,index){
+				this.csCurrent = index;
+				console.log(this.csCurrent);
+			},
+			popupShow(e) {
+				this.popupData = e;
+				setTimeout(() => {
+					this.show = true;
+				}, 100);
+				console.log(123);
+			},
 			//逛店铺
 			goStore(index) {
 				uni.navigateTo({
@@ -412,31 +507,44 @@
 		overflow: hidden;
 		.cart-bg {
 		  width: 100%;
-		  height: 230upx;
-		  background: linear-gradient(90deg, rgba(255, 162, 0, 1), rgba(255, 121, 17, 1));
-		  border-radius: 0 0 40upx 40upx;
+		//   height: 230upx;
+			position: relative;
+		  	background: linear-gradient(135deg, #EC3A17 0%, #D50A2F 100%);
 		  .cart-num-box {
 		    display: flex;
 		    flex-direction: row;
 		    align-items: center;
 		    justify-content: space-between;
-			.num-box {
-			  padding: 30upx 0 30upx 30upx;
-			  box-sizing: border-box;
-			  font-size: 30upx;
-			  color: #fff;
+			// .num-box {
+			//   padding: 30upx 0 30upx 30upx;
+			//   box-sizing: border-box;
+			//   font-size: 30upx;
+			//   color: #fff;
+			// }
+			.dizhi-box{
+				width: 42rpx;
+				height: 42rpx;
+				padding-left: 60rpx;
 			}
 			.btn-box {
-			  font-size: 30upx;
+			  font-size: 27upx;
 			  color: #fff;
 			  padding: 30upx;
 			  box-sizing: border-box;
 			  display: inline-block;
 			}
+			.title_box{
+				// position: absolute;
+				// left: 50%;
+				// top: 50%;
+				// transform: translate(-50%,-50%);
+				font-size: 32rpx;
+				color: #fff;
+			}
 		  }
 		}
 		.cart-list-box {
-		  margin-top: -130upx;
+		//   margin-top: -130upx;
 		  padding: 0 30upx;
 		  box-sizing: border-box;
 		  .item {
@@ -478,6 +586,21 @@
 				}
 			  }
 			}
+			.remarks{
+				padding:0 0 20rpx 98rpx;
+				display: flex;
+				div{
+					padding: 0 14rpx;
+					height: 54rpx;
+					background: #F5F5F5;
+					border-radius: 4rpx;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					color: #888888;
+					font-size: 24rpx;
+				}
+			}
 			.product-list-box{
 				.pro-item {
 				  display: flex;
@@ -511,15 +634,22 @@
 					  display: flex;
 					  flex-direction: column;
 					  justify-content: space-between;
+					  .sku-img{
+						  margin-top: 20rpx;
+						image{
+								width: 170rpx;
+								height: 30rpx;
+						}
+					  }
 					  .pro-name {
-					    height: 66upx;
+					    // height: 66upx;
 					    line-height: 33upx;
 					    display: -webkit-box;
 					    overflow: hidden;
 					    text-overflow: ellipsis;
 					    word-break: break-all;
 					    -webkit-box-orient: vertical;
-					    -webkit-line-clamp: 2;
+					    -webkit-line-clamp: 1;
 					  }
 					  .sku-box {
 					    width: 100%;
@@ -534,6 +664,7 @@
 					    box-sizing: border-box;
 					    font-size: 24upx;
 					    color: #999;
+						margin-top: 10rpx;
 						.arrow-down-img {
 						  width: 40upx;
 						  height: 40upx;
@@ -547,12 +678,10 @@
 					    align-items: center;
 					    justify-content: space-between;
 						.pro-price-box {
-						  font-size: 36upx;
-						  color: #ff7911;
+						  font-size: 28upx;
+						  color: #FB3F3D;
 						  font-weight: 400;
-						  .fuhao {
-						    font-size: 24upx;
-						  }
+						  
 						}
 						.pro-num-box{
 						  width: 140upx;
@@ -632,26 +761,28 @@
 			}
 			.right {
 			  display: flex;
+			  height: 100%;
 			  flex-direction: row;
 			  align-items: center;
-			  padding: 0 30upx 0 0;
+			//   padding: 0 30upx 0 0;
 			  box-sizing: border-box;
 			  .price-box {
 			    font-size: 30upx;
 			    color: #333;
 				.price {
-				  color: #ff7911;
+				  color: #FB3F3D;
 				  font-weight: bold;
 				}
 			  }
 			  .btn-confirm {
 			    width: 215upx;
-			    height: 80upx;
-			    background: linear-gradient(90deg, rgba(255, 162, 0, 1), rgba(255, 121, 17, 1));
-			    border-radius: 40upx;
+			    height: 100%;
+			    background: #FB3F3D;
+			    // border-radius: 40upx;
 			    margin-left: 18upx;
-			    text-align: center;
-			    line-height: 80upx;
+			    display: flex;
+				justify-content: center;
+				align-items: center;
 			    font-size: 28upx;
 			    color: #fff;
 			  }
@@ -785,6 +916,162 @@
 					font-size: 28upx;
 					line-height: 80upx;
 					text-align: center;
+				}
+			}
+		}
+		.car-popup{
+			.car-popup-container{
+				padding: 20rpx;
+				.head{
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					height: 118rpx;
+					padding: 10rpx 0;
+					border-bottom: 2rpx solid #D8D8D8;
+					.head-left{
+						width: 118rpx;
+						border: 2prx solid #D8D8D8;
+						image{
+							width: 100%;
+						}
+					}
+					.head-middle{
+						flex: 1;
+						margin-left: 20rpx;
+						height: 100%;
+						display: flex;
+						flex-direction: column;
+						justify-content: space-between;
+						.h-m-top{
+							color: #FB3F3D;
+							:nth-child(1){
+								padding-right: 10rpx;
+							}
+							:nth-child(2){
+								font-size: 38rpx;
+							}
+						}
+						.h-m-bottom{
+							color: #979797;
+							font-size: 27rpx;
+						}
+					}
+				}
+				.content{
+					margin-top: 15rpx;
+					.content-scroll{
+						height: 274rpx;
+						width: 100%;
+						display: flex;
+						font-size: 26rpx;
+						/deep/ .uni-scroll-view-content{
+							display: flex;
+							flex-wrap: wrap;
+							.c-s-item{
+								background: #F5F5F5;
+								border-radius: 8rpx;
+								padding: 15rpx;
+								margin: 20rpx 20rpx 0 0;
+								border: 2rpx solid #F5F5F5;
+							}
+							.active{
+								background: #fff;
+								color: #FB3F3D;
+								border: 2rpx solid #FB3F3D;
+							}
+						}
+					}
+				}
+				.foot{
+					.foot-scroll{
+						width: 100%;
+						font-size: 26rpx;
+						/deep/ .uni-scroll-view-content{
+							display: flex;
+							flex-wrap: nowrap;
+							.f-item{
+								background: #F5F5F5;
+								border-radius: 8rpx;
+								padding: 2rpx 30rpx;
+								margin: 20rpx 20rpx 0 0;
+								border: 2rpx solid #F5F5F5;
+							}
+							.active{
+								background: #fff;
+								color: #FB3F3D;
+								border: 2rpx solid #FB3F3D;
+							}
+						}
+					}
+				}
+				.btn{
+					display: flex;
+					margin-top: 90rpx;
+					padding-bottom: calc(env(safe-area-inset-bottom) + 10rpx);
+					div{
+						width: 670rpx;
+						height: 92rpx;
+						background: #FB3F3D;
+						border-radius: 50rpx;
+						opacity: 0.9;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						color: #fff;
+						font-size: 32rpx;
+					}
+				}
+			}
+		}
+		.remark-popup{
+			.remark-container{
+				width: 574rpx;
+				.title{
+					text-align: center;
+					font-size: 32rpx;
+					color: #333333;
+					padding: 30rpx 30rpx 24rpx 30rpx;
+				}
+				.textarea{
+					background: #E5E5E5;
+					border-radius: 8rpx;
+					height: 200rpx;
+					margin: 0rpx 30rpx 0 30rpx;
+					overflow: hidden;
+					textarea{
+						width: 95%;
+						height: 100%;
+						padding: 20rpx;
+						font-size: 26rpx;
+					}
+				}
+				.btn{
+					display: flex;
+					width: 100%;
+					align-items: center;
+					height: 96rpx;
+					border-top: 2rpx solid #D8D8D8;
+					margin-top: 25rpx;
+					div{
+						flex: .5;
+						height: 100%;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						font-size: 29rpx;
+						color: #333333;
+					}
+					:nth-child(1){
+						border-right: 2rpx solid #D8D8D8;
+					}
+					:nth-child(1):active{
+						background: #d8d8d8ab;
+					}
+					:nth-child(2):active{
+						background: cornflowerblue;
+						color: #fff;
+					}
 				}
 			}
 		}

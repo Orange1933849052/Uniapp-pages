@@ -1,32 +1,50 @@
 <template>
-	<view class="content">
+	<view class="container">
+		<div>
+			<searchBar />
+		</div>
+		<view class="content">
 		<!-- 分类中心 -->
-		<scroll-view scroll-y class="left-aside">
-			<view v-for="(item,index) in flist" :key="item.classifyId" class="f-item b-b" :class="{active: index === currentIndex}" @click="tabtap(item,index)">
-				{{item.classifyName}}
-			</view>
-		</scroll-view>
-		<scroll-view v-if="slist.length > 0"  scroll-with-animation scroll-y class="right-aside">
-			<view v-for="item in slist" :key="item.classifyId" class="s-list">
-				<text class="s-item">{{item.classifyName}}</text>
-				<view class="t-list">
-					<view @click="navToList(item.classifyId, titem.classifyId)" class="t-item" v-for="titem in item.childs" :key="titem.classifyId">
-						<image :src="titem.classifyImage"></image>
-						<text>{{titem.classifyName}}</text>
+			<scroll-view scroll-y class="left-aside">
+				<view v-for="(item,index) in flist" :key="item.classifyId" class="f-item b-b" :class="{active: index === currentIndex}" @click="tabtap(item,index)">
+					<div>{{item.classifyName}}</div>
+					<div class="f-item-num">2888</div>
+				</view>
+			</scroll-view>
+			<scroll-view v-if="slist.length > 0"  scroll-with-animation scroll-y class="right-aside">
+				<!-- <u-tabs :list="list" :is-scroll="false" :current="current" @change="change"></u-tabs> -->
+				<div class="tabs">
+					<div class="tab-item" @click="changeTab(index)" :class="current===index ? 'active':''" v-for="(item,index) in list" :key="index">
+						<span>{{item.name}}</span>
+						<span>{{item.num}}</span>
+					</div>
+				</div>
+				<div class="day">
+					<div class="day-item" @click="changeClassify(index)" :class="dayCurrent===index ? 'active':''" v-for="(item,index) in dayList" :key="index">
+						{{item.name}}
+					</div>
+				</div>
+				<view v-for="item in slist" :key="item.classifyId" class="s-list">
+					<text class="s-item">{{item.classifyName}}</text>
+					<view class="t-list">
+						<view @click="navToList(item.classifyId, titem.classifyId)" class="t-item" v-for="titem in item.childs" :key="titem.classifyId">
+							<image :src="titem.classifyImage"></image>
+							<text>{{titem.classifyName}}</text>
+						</view>
 					</view>
 				</view>
+			</scroll-view>
+			<view v-else class="emptyOrder-box flex-items-plus flex-column ">
+				<image class="emptyOrder-img" src="../../../static/images/totalAwardEmpty.png"></image>
+				<label class="font-color-999 fs26 mar-top-30">该分类没有商品～</label>
 			</view>
-		</scroll-view>
-		<view v-else class="emptyOrder-box flex-items-plus flex-column ">
-			<image class="emptyOrder-img" src="../../../static/images/totalAwardEmpty.png"></image>
-			<label class="font-color-999 fs26 mar-top-30">该分类没有商品～</label>
 		</view>
 	</view>
 </template>
-
 <script>
 	const NET = require('../../../utils/request')
 	const API = require('../../../config/api')
+	import searchBar from '@/component/search-bar'
 	export default {
 		data() {
 			return {
@@ -35,11 +53,37 @@
 				currentIndex: 0,
 				currentId:'',
 				flist: [],
-				slist: []
+				slist: [],
+				list: [
+					{
+						name:'热销',
+						num: 1232
+					},
+					{
+						name: '预告',
+						num: 8888
+					}
+				],
+				current: 0,
+				dayList: [
+					{
+						name: '今日上架'
+					},
+					{
+						name: '昨日上架'
+					},
+					{
+						name: '更早上架'
+					}
+				],
+				dayCurrent: 0
 			}
 		},
 		onLoad() {
 			this.loadData();
+		},
+		components:{
+			searchBar
 		},
 		methods: {
 			loadData(){
@@ -56,6 +100,12 @@
 				}).catch(res => {
 					uni.hideLoading()
 				})
+			},
+			changeTab(e) {
+				this.current = e;
+			},
+			changeClassify(e) {
+				this.dayCurrent = e;
 			},
 			getChildCategory(){
 				uni.showLoading({
@@ -120,7 +170,7 @@
 	page,
 	.content {
 		height: 100%;
-		background-color: #f8f8f8;
+		background-color: #fff;
 	}
 	
 	.content {
@@ -130,20 +180,37 @@
 		flex-shrink: 0;
 		width: 200upx;
 		height: 100%;
-		background-color: #fff;
+		background-color: #F5F5F5;
 		border-right: solid 1px #ddd;
 	}
 	.f-item {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex-direction: column;
 		width: 100%;
-		height: 100upx;
+		// height: 100upx;
 		font-size: 28upx;
 		color: $font-color-base;
 		position: relative;
+		padding: 30rpx 0;
+		.f-item-num{
+			// background: #FB3F3D;
+			border: 2rpx solid #979797;
+			color: #979797;
+			font-size: 20rpx;
+			border-radius: 30rpx;
+			padding: 0 10rpx;
+			margin-top: 6rpx;
+		}
 		&.active{
-			color: $base-color;
+			color: #FB3F3D;
+			background: #FFF3F7;
+			.f-item-num{
+				border: 2rpx solid #FB3F3D;
+				background: #FB3F3D;
+				color: #fff;
+			}
 			&:before{
 				content: '';
 				position: absolute;
@@ -152,7 +219,7 @@
 				transform: translateY(-50%);
 				height: 100upx;
 				width: 8upx;
-				background-color: $base-color;
+				background-color: #FB3F3D;
 				border-radius: 0 4px 4px 0;
 				opacity: .8;
 			}
@@ -163,6 +230,80 @@
 		flex: 1;
 		padding-left: 20upx;
 		background: #fff;
+		.tabs{
+			display: flex;
+			width: 100%;
+			align-items: center;
+			justify-content: space-around;
+			padding-top: 30rpx;
+			.active{
+				position: relative;
+				transition: height 1s linear 2s;
+				transition-duration: 0.5s;
+						transition-property: background-color,color;
+				// color: #FB3F3D!important;
+				:nth-child(1){
+					color: #FB3F3D!important;
+					position: relative;
+					&:after{
+						width: 100%;
+						height: 4rpx;
+						background: #FB3F3D;
+						position: absolute;
+						left: 0;
+						bottom: -10rpx;
+						content: "";
+						transition-duration: 0.5s;
+						transition-property: background-color,color;
+					}
+				}
+				:nth-child(2){
+					border: 2rpx solid #FB3F3D!important;
+					color: #fff!important;
+					background: #FB3F3D;
+				}
+			}
+			.tab-item{
+				display: flex;
+				align-items: center;
+				:nth-child(1){
+					font-size: 32rpx;
+					color: #333333;
+					margin-right: 10rpx;
+				}
+				:nth-child(2){
+					border: 2rpx solid #979797;
+					padding: 0 10rpx;
+					border-radius: 20rpx;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					font-size: 20rpx;
+					color: #979797;
+				}
+			}
+		}
+		.day{
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-top: 40rpx;
+			.day-item{
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 156rpx;
+				height: 50rpx;
+				background: #F5F5F5;
+				border-radius: 4rpx;
+				font-size: 26rpx;
+				color: #333333;
+			}
+			.active{
+				background: #FFF3F7;
+				color: #FB3F3D;
+			}
+		}
 	}
 	.s-item{
 		display: flex;

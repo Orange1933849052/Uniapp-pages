@@ -1,10 +1,22 @@
 <template>
 	<div class="layout hom-layout">
 		<div class="list-group-item" v-for="(item,index) in componentsData.slice(0,1)" :key="index">
-			<!-- 	<component :is="componentMap[terminal-1].get(item.type)" :componentContent="item.componentContent" :terminal="terminal"
+				<!-- <component :is="componentMap[terminal-1].get(item.type)" :componentContent="item.componentContent" :terminal="terminal"
 			 @tabChange='tabChange'></component> -->
 			<com-shop-header v-if="item.type==='shopHeader'" :noticeList="noticeList"
 				:componentContent="item.componentContent" :terminal="terminal" @tabChange='tabChange'></com-shop-header>
+			 <classifyList></classifyList>
+			 <discountCard />
+			 <shopList></shopList>
+			 <publicShopCard />
+			 <!-- <publicShopCard />
+			 <publicShopCard />
+			 <publicShopCard />
+			 <publicShopCard />
+			 <publicShopCard />
+			 <publicShopCard />
+			 <publicShopCard />
+			 <publicShopCard /> -->
 			<com-text v-if="item.type==='text'" :componentContent="item.componentContent" :terminal="terminal">
 			</com-text>
 			<com-image-text v-if="item.type==='imageText'" :componentContent="item.componentContent"
@@ -42,8 +54,8 @@
 			<div class="list-group-item" v-for="(item,index) in componentsData.slice(1)" :key="index">
 				<!-- <component :is="componentMap[terminal-1].get(item.type)" :componentContent="item.componentContent" :terminal="terminal"
 				 @tabChange='tabChange'></component> -->
-				<com-shop-header v-if="item.type==='shopHeader'" :componentContent="item.componentContent"
-					:terminal="terminal" @tabChange='tabChange'></com-shop-header>
+				<!-- <com-shop-header v-if="item.type==='shopHeader'" :componentContent="item.componentContent"
+					:terminal="terminal" @tabChange='tabChange'></com-shop-header> -->
 				<com-text v-if="item.type==='text'" :componentContent="item.componentContent" :terminal="terminal">
 				</com-text>
 				<com-image-text v-if="item.type==='imageText'" :componentContent="item.componentContent"
@@ -110,7 +122,7 @@
 					<label class="font-color-999 fs26 mar-top-30">这里空空如也~</label>
 			</view>
 		</view>
-		<loading-toast ref='loadingToast'></loading-toast>
+		<!-- <loading-toast ref='loadingToast'></loading-toast> -->
 	</div>
 </template>
 
@@ -120,6 +132,10 @@
 	} from 'vuex'
 	// import comComponentMap from './componentMap'
 	import comShopHeader from '@/components/canvasShow/cereshop/app/web/shopHeader'
+	import classifyList from '@/components/canvasShow/basics/classify-list'
+	import shopList from '@/components/canvasShow/basics/shop-list/shop-list'
+	import publicShopCard from '@/components/canvasShow/basics/public-shop-card'
+	import discountCard from '@/components/canvasShow/basics/discount-card'
 	import comText from '@/components/canvasShow/basics/text'
 	import comImageText from '@/components/canvasShow/basics/imageText'
 	import comBrandList from '@/components/canvasShow/basics/brandList'
@@ -160,7 +176,11 @@
 			comGroupList,
 			comDiscountList,
 			comSpikeList,
-			loadingToast
+			loadingToast,
+			classifyList,
+			shopList,
+			publicShopCard,
+			discountCard
 		},
 		data() {
 			return {
@@ -205,7 +225,7 @@
 			// 读取画布
 			canvasGet() {
 				var _this = this
-				this.$refs.loadingToast.setCanvasLoading(true)
+				// this.$refs.loadingToast.setCanvasLoading(true)
 				var apiUrl = API.getCanvas + '?terminal=' + this.terminal + '&type=' + this.typeId
 				if (this.shopId) {
 					apiUrl += '&shopId=' + this.shopId
@@ -214,7 +234,7 @@
 					apiUrl += '&canvasId=' + this.canvasId
 				}
 				NET.request1(apiUrl, null, 'GET').then(res => {
-					this.$refs.loadingToast.setCanvasLoading(false)
+					// this.$refs.loadingToast.setCanvasLoading(false)
 					// uni.hideLoading()
 					if (JSON.stringify(res.data) !== '{}') {
 						// _this.canvasId = res.data.canvasId
@@ -222,7 +242,7 @@
 						var componentsData = this.componentsData
 						for (let i = 0; i < componentsData.length; i++) {
 							if (componentsData[i].type === 'productList') {
-								this.$refs.loadingToast.setCanvasLoading(true)
+								// this.$refs.loadingToast.setCanvasLoading(true)
 								store.commit("loadNumAdd");
 								if (componentsData[i].componentContent.productData.sourceType === '1') {
 									NET.request1(
@@ -244,7 +264,7 @@
 									})
 								}
 							} else if (componentsData[i].type === 'coupon' || componentsData[i].type === 'groupList' || componentsData[i].type === 'spikeList' || componentsData[i].type === 'discountList') {
-								this.$refs.loadingToast.setCanvasLoading(true)
+								// this.$refs.loadingToast.setCanvasLoading(true)
 								store.commit("loadNumAdd");
 							}
 						}
@@ -255,19 +275,19 @@
 			},
 			tabChange(index, id) {
 				this.activeTab = index
-        if (index !== 0) {
-          NET.request1(`${API.getProducts}?page=1&pageSize=20&classifyId=${id}`, null, 'GET').then(proRes => {
-            this.goodsCategoryList = proRes.data.list
-            this.categoryListLen = proRes.data.total
-          })
-        }
+				if (index !== 0) {
+					NET.request1(`${API.getProducts}?page=1&pageSize=20&classifyId=${id}`, null, 'GET').then(proRes => {
+						this.goodsCategoryList = proRes.data.list
+						this.categoryListLen = proRes.data.total
+					})
+				}
 			},
 			getNotice() {
-				NET.request(API.getNotice, {}, 'GET').then(res => {
-					if (res.code === '200') {
-						this.noticeList = res.data
-					}
-				})
+				// NET.request(API.getNotice, {}, 'GET').then(res => {
+				// 	if (res.code === '200') {
+				// 		this.noticeList = res.data
+				// 	}
+				// })
 			}
 		}
 	}
@@ -275,7 +295,6 @@
 
 <style lang="scss" scoped>
 	.hom-layout {
-		background-color: #fff;
 	}
 </style>
 

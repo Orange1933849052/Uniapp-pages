@@ -1,17 +1,20 @@
 <template>
 	<view class="container">
 		<!-- 商品列表 -->
-		<view class="flex-items-plus flex-row mar-top-20">
+		<view class="flex-items-plus search-container mar-top-20">
 			<view class="searchImg-box flex-items-plus">
 				<image class="searchImg" src="../../static/img/searchImg.png"></image>
 				<input class="search-box" v-model="keyWord" placeholder-class="searchboxPlace" placeholder="请输入您想要的宝贝" />
 				<image class="searchClose-icon" @click="searchTextDel" src="../../static/img/index/searchClose_icon.png"></image>
 			</view>
-			<label class="mar-left-40 fs26" @click="searchList(1)">搜索</label>
+			<div class="fs26 search-btn" @click="searchList(1)">搜索</div>
 		</view>
+		<div>
+			<u-tabs active-color="#FB3F3D" :list="tabsList" :current="current" @change="tabChange"></u-tabs>
+		</div>
     <view class="shop-list-nav">
       <view class="nav-item-sort" @click="sortTap(1)">
-        <text class="nav-title" :class="{'active' : sortIndex == 1}">默认</text>
+        <text class="nav-title" :class="{'active' : sortIndex == 1}">综合排序</text>
       </view>
       <view class="nav-item-sort" @click="sortTap(2)">
         <text class="nav-title" :class="{'active' : sortIndex == 2}">价格</text>
@@ -27,25 +30,30 @@
           <image src="../../static/images/arrow-sort-down.png" v-if="volume == 2" class="arrow-img padd-b"></image>
         </view>
       </view>
+	  <view class="nav-item-sort" @click="sortTap(4)">
+        <text class="nav-title" :class="{'active' : sortIndex == 4}">上新</text>
+        <view class="r">
+          <image src="../../static/images/arrow-sort-up.png" v-if="volume == 1" class="arrow-img padd-t"></image>
+          <image src="../../static/images/arrow-sort-down.png" v-if="volume == 2" class="arrow-img padd-b"></image>
+        </view>
+      </view>
     </view>
-		<view v-if="list.length>0">
-			<view v-for="(item, index) in list" :key="index" class="goodsDetails-box flex-display flex-column mar-left-30" @click="goodsDateils(item.shopId,item.productId,item.skuId)">
-				<view v-if="item.activityType == 0" class="goodsDetails flex-items-plus flex-row mar-top-30">
+		<view v-if="list.length>0" class="goodsList">
+			<view v-for="(item, index) in list" :key="index" class="goodsDetails-box flex-display flex-column" @click="goodsDateils(item.shopId,item.productId,item.skuId)">
+				<view v-if="item.activityType == 0" class="goodsDetails flex-items-plus flex-row">
 					<image class="goodsImg" :src="item.image"></image>
-					<view class="mar-left-30">
+					<view class="goods-info">
 						<view class="goodsName-box overflowNoDot">
 							<label class="goodsName fs26">{{item.productName}}</label>
 						</view>
 						<view class="priceBuyNum-box mar-top-20">
-							<label class="fs24 font-color-FF7800">¥</label>
-							<label class="fs36 font-color-FF7800 mar-left-10">{{item.price}}</label>
-							<label class="fs24 font-color-999 mar-left-10" v-if="item.users != null">{{item.users}}人付款</label>
-							<label class="fs24 font-color-999 mar-left-10" v-else>0人付款</label>
+							<label class="fs24" style="color:#FB3F3D">¥</label>
+							<label class="fs36 mar-left-10" style="color:#FB3F3D">{{item.price}}</label>
+							<label style="text-decoration: line-through;" class="fs24 font-color-999 mar-left-20" >¥123</label>
 						</view>
-						<view class="flex-display flex-sp-between flex-row mar-top-10 flex-items">
-							<label class="fs22 font-color-999">{{item.shopName}}</label>
-							<image class="arrowImg" src="../../static/img/user/arrow.png"></image>
-						</view>
+						<div class="pay-btn">
+							<image mode="heightFix" :src="require('@/static/assets/img/编组 7@2x.png')" />
+						</div>
 					</view>
 				</view>
 				<view v-else class="spikeList">
@@ -99,10 +107,19 @@
 				source:2,
 				list:[],
 				loadingType:0,
-        sortIndex: 0,
-        ifNew:0,//是否新品
-        type:1,//价格排序条件
-        volume:1,//销量排序条件
+				tabsList: [
+					{
+						name:'商品'
+					},
+					{
+						name:'活动'
+					}
+				],
+				current: 0,
+				sortIndex: 0,
+				ifNew:0,//是否新品
+				type:1,//价格排序条件
+				volume:1,//销量排序条件
 			}
 		},
 		onLoad(option) {
@@ -123,6 +140,10 @@
 			}
 		},
 		methods: {
+			tabChange(e){
+				this.current = e;
+				console.log(e);
+			},
       sortTap(index){
         this.page = 1
         this.list = []
@@ -138,7 +159,12 @@
               this.type = 1,
               this.volume = this.volume != 1 ? 1:2,
               this.sortIndex = index
+        }else if(index == 4){
+              this.type = 1,
+              this.volume = this.volume != 1 ? 1:2,
+              this.sortIndex = index
         }
+		
         this.searchList()
       },
 			searchTextDel(){
@@ -201,9 +227,37 @@
 </script>
 
 <style lang="scss">
+page{
+	background: #F5F5F5;
+}
 	input{padding-left: 80upx;}
 	.container{
 		height: 100%;
+		.search-container{
+			display: flex;
+			justify-content: space-between;
+			// width: 90%;
+			margin: 0 auto;
+			background: #fff;
+			padding: 0 4%;
+			.search-btn{
+				padding: 0 40rpx;
+				height: 52rpx;
+				background: linear-gradient(135deg, #EC6C17 0%, #D50A2F 100%);
+				border-radius: 32rpx;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+			}
+			.searchImg-box{
+				flex: .8!important;
+				display: flex;
+				background-color: #F7F7F7;
+				border-radius: 33upx;
+				position: relative;
+			}
+		}
 		.emptyCart-box{
 			margin-top: 70upx;
 			.emptyCart-img{
@@ -215,12 +269,12 @@
 			width: 36upx;
 			height: 36upx;
 			position: absolute;
-			left: 60upx;
+			left: 10upx;
 		}
 		.search-box{
-			background-color: #F7F7F7;
-			border-radius: 33upx;
-			width: 530upx;
+			// width: 480upx;
+			flex: 1;
+			padding: 0 60rpx;
 			height: 66upx;
 		}
 		.searchboxPlace{
@@ -238,13 +292,29 @@
 			width: 130upx;
 			height: 30upx;
 		}
+		.goodsList{
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			// padding: 0 20rpx;
+			width: calc(100% - 40rpx);
+			margin: 0 auto;
+		}
 		.goodsDetails-box{
-			width: 690upx;
+			// width: 690upx;
+			width: calc(50% - 10rpx);
+			background: #fff;
+			display: flex;
+			flex-direction: column;
+			margin-top: 20rpx;
+			border-radius: 15rpx;
 			.goodsDetails{
 				border-bottom: 1upx solid #EDEDED;
 				padding-bottom: 30upx;
+				display: flex;
+				flex-direction: column;
 				.goodsName-box{
-					width: 389upx;
+					// width: 389upx;
 					height: 85upx;
 					.img618-cion{
 						width:70upx;
@@ -252,8 +322,20 @@
 					}
 				}
 				.goodsImg{
-					width: 260upx;
-					height: 260upx;
+					width: 100%;
+					height: 346upx;
+				}
+				.goods-info{
+					width: 100%;
+					padding-top: 20rpx;
+					.pay-btn{
+						width: 100%;
+						padding-top: 20rpx;
+						text-align: center;
+						image{
+							height: 54rpx;
+						}
+					}
 				}
 				.discounts-box{
 					margin-left: -10upx;
@@ -346,7 +428,7 @@
   }
 
   .nav-item.active {
-    color: #ff7911;
+    color: #FB3F3D;
   }
 
   .nav-item .line {
@@ -366,7 +448,7 @@
     box-sizing: border-box;
   }
   .active{
-    color: #ff7911;
+    color: #FB3F3D;
   }
   .nav-item.padd-r {
     padding-right: 20%;

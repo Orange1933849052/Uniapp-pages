@@ -2,34 +2,38 @@
 	<!-- 编辑/添加地址 -->
 	<view class="container flex-center flex-column">
 		<view class="addressBack-box">
-			<view class="consignee-box bor-line-F7F7F7">
-				<input v-model="username" class="fs28"  placeholder-class="consignee" placeholder="收货人" />
+			<view class="consignee-box bor-line-E5E5E5">
+				<div>收货人</div>
+				<input v-model="username" class="fs28"  placeholder-class="consignee" placeholder="请输入收货人姓名" />
 			</view>
-			<view class="iphoneNum-box bor-line-F7F7F7">
-				<input type="number" v-model="phone" class="fs28" placeholder-class="iphoneNum" placeholder="手机号码" />
+			<view class="iphoneNum-box bor-line-E5E5E5">
+				<div>手机号</div>
+				<input type="number" v-model="phone" class="fs28" placeholder-class="iphoneNum" placeholder="请输入收货人手机号" />
 			</view>
-			<view @click="locationClick" class="location-box bor-line-F7F7F7 flex-row-plus flex-sp-between flex-items">
-				<view class="fs28 location">所在地</view>
+			<view @click="locationClick" class="location-box bor-line-E5E5E5 flex-row-plus flex-sp-between flex-items">
+				<view class="fs28 location">省市区</view>
 				<view>
 					<city-select v-model="locationShowFalg" @city-change="cityChange"></city-select>
-					<label v-model="ssqText">{{ssqText}}</label>
+					<label>{{ssqText || '请选择省市区'}}</label>
 					<image class="arrow mar-left-20" src="../../static/img/user/arrow.png"></image>
 				</view>
 			</view>
+
 			<view class="detailAddress-box">
+				<div>街道</div>
 				<input class="fs28" v-model="address" placeholder-class="detailAddress" placeholder="详细地址：如道路、门牌号、小区、楼栋号、单元等" />
 			</view>
 		</view>
 		<view class="addressTagBack-box">
-			<view @click="addressTagClick" class="addressTag-box bor-line-F7F7F7 flex-row-plus flex-sp-between flex-items">
+			<view @click="addressTagClick" class="addressTag-box bor-line-E5E5E5 flex-row-plus flex-sp-between flex-items">
 				<view class="fs28 addressTag">地址标签</view>
 				<view>
-					<label v-model="tag">{{tag}}</label>
+					<label>{{tag}}</label>
 					<image class="arrow mar-left-20" src="../../static/img/user/arrow.png"></image>
 				</view>
 			</view>
 			<view class="defaultState-box flex-row-plus flex-sp-between flex-items">
-				<view class="fs28 defaultState">设为默认地址</view>
+				<view class="fs28 defaultState">是否设为默认地址</view>
 				<u-switch v-model="isDefault" active-color="#FF7800" inactive-color="#eee"></u-switch>
 			</view>
 		</view>
@@ -51,6 +55,7 @@
 import citySelect from './u-city-select.vue';
 const NET = require('../../utils/request')
 const API = require('../../config/api')
+import readCopyAddress from "@/utils/readCopyAddress.js";
 	export default {
 		components: {
 			citySelect
@@ -102,40 +107,41 @@ const API = require('../../config/api')
 			}
 			let receiveId = options.receiveId
 			if(this.type == 2){
-        uni.showLoading({
-          title: '请稍后...',
-        })
-        NET.request(API.receiveGetInfo,{receiveId:receiveId},"GET").then(res => {
-          this.editAddress = res.data
-          this.username = this.editAddress.receiveName
-          this.phone = this.editAddress.receivePhone
-          this.ssqText = this.editAddress.receiveAdress
-          this.address = this.editAddress.address
-          this.tag = this.editAddress.label
-          this.isDefault = this.editAddress.defult
-          let ssqarr = this.ssqText.split("-")
-          this.province = ssqarr[0]
-          this.city = ssqarr[1]
-          this.area = ssqarr[2]
-          this.id = this.editAddress.receiveId
-          uni.hideLoading()
-        }).catch(res => {
+				uni.showLoading({
+				title: '请稍后...',
+				})
+				NET.request(API.receiveGetInfo,{receiveId:receiveId},"GET").then(res => {
+				this.editAddress = res.data
+				this.username = this.editAddress.receiveName
+				this.phone = this.editAddress.receivePhone
+				this.ssqText = this.editAddress.receiveAdress
+				this.address = this.editAddress.address
+				this.tag = this.editAddress.label
+				this.isDefault = this.editAddress.defult
+				let ssqarr = this.ssqText.split("-")
+				this.province = ssqarr[0]
+				this.city = ssqarr[1]
+				this.area = ssqarr[2]
+				uni
+				this.id = this.editAddress.receiveId
+				uni.hideLoading()
+				}).catch(res => {
 
-        })
-        // this.editAddress = JSON.parse(uni.getStorageSync('editAddress')) receiveGetInfo
-        // if(Object.keys(this.editAddress).length > 0){
-        //   this.username = this.editAddress.receiveName
-        //   this.phone = this.editAddress.receivePhone
-        //   this.ssqText = this.editAddress.receiveAdress
-        //   this.address = this.editAddress.address
-        //   this.tag = this.editAddress.label
-        //   this.isDefault = this.editAddress.defult
-        //   let ssqarr = this.ssqText.split("-")
-        //   this.province = ssqarr[0]
-        //   this.city = ssqarr[1]
-        //   this.area = ssqarr[2]
-        //   this.id = this.editAddress.receiveId
-        // }
+				})
+				// this.editAddress = JSON.parse(uni.getStorageSync('editAddress')) receiveGetInfo
+				// if(Object.keys(this.editAddress).length > 0){
+				//   this.username = this.editAddress.receiveName
+				//   this.phone = this.editAddress.receivePhone
+				//   this.ssqText = this.editAddress.receiveAdress
+				//   this.address = this.editAddress.address
+				//   this.tag = this.editAddress.label
+				//   this.isDefault = this.editAddress.defult
+				//   let ssqarr = this.ssqText.split("-")
+				//   this.province = ssqarr[0]
+				//   this.city = ssqarr[1]
+				//   this.area = ssqarr[2]
+				//   this.id = this.editAddress.receiveId
+				// }
 
 			}
 			if(this.editAddress != ''){
@@ -313,6 +319,7 @@ const API = require('../../config/api')
 		background-color: #F7F7F7;
 	}
 	.container{
+		// padding: 32rpx;
 		.addressBack-box{
 			background-color: #FFFFFF;
 			padding: 30upx 30upx;
@@ -320,6 +327,9 @@ const API = require('../../config/api')
 				padding-bottom: 36upx;
 				width: 690upx;
 				margin-top: 20upx;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 				.consignee{
 					color: #999999;
 					font-size: 28upx;
@@ -329,6 +339,9 @@ const API = require('../../config/api')
 				padding-bottom: 36upx;
 				width: 690upx;
 				margin-top: 36upx;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 				.iphoneNum{
 					color: #999999;
 					font-size: 28upx;
@@ -338,6 +351,9 @@ const API = require('../../config/api')
 				padding-bottom: 36upx;
 				width: 690upx;
 				margin-top: 36upx;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 				.location{
 					color: #999999;
 					font-size: 28upx;
@@ -347,6 +363,7 @@ const API = require('../../config/api')
 				padding-bottom: 36upx;
 				width: 690upx;
 				margin-top: 36upx;
+				
 				.detailAddress{
 					color: #999999;
 					font-size: 28upx;

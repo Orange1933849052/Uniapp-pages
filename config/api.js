@@ -1,4 +1,4 @@
-	const DOMAIN_PREFIX = 'http://localhost1:9007'
+	const DOMAIN_PREFIX = 'https://mall.lantiansh.cn'
 // #ifndef H5
 	const WX_API_BASE = DOMAIN_PREFIX + '/api' // app
 // #endif
